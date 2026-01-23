@@ -59,8 +59,9 @@ export const PostsAPI = {
   update: (postId, payload) => request(`/v1/posts/${postId}`, { method: "PATCH", body: payload }),
   remove: (postId) => request(`/v1/posts/${postId}`, { method: "DELETE" }),
 
-  like: (postId) => request(`/v1/posts/${postId}/like`, { method: "POST" }),
-  unlike: (postId) => request(`/v1/posts/${postId}/like`, { method: "DELETE" }),
+  // ✅ 백엔드 라우터와 일치: /likes
+  like: (postId) => request(`/v1/posts/${postId}/likes`, { method: "POST" }),
+  unlike: (postId) => request(`/v1/posts/${postId}/likes`, { method: "DELETE" }),
 
   listComments: (postId) => request(`/v1/posts/${postId}/comments`),
   createComment: (postId, payload) => request(`/v1/posts/${postId}/comments`, { method: "POST", body: payload }),

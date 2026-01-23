@@ -29,6 +29,7 @@ const ownerActions = document.getElementById("ownerActions");
 const editBtn = document.getElementById("editPostBtn");
 const deleteBtn = document.getElementById("deletePostBtn");
 
+const likeBtn = document.getElementById("likeBtn");      // ✅ 추가
 const likeCountEl = document.getElementById("likeCount");
 const hitCountEl = document.getElementById("hitCount");
 const commentCountEl = document.getElementById("commentCount");
@@ -57,6 +58,29 @@ function canSubmitComment() {
 
 commentInput.addEventListener("input", canSubmitComment);
 
+// ✅ 좋아요 상태/카운트 캐시(목록 반영용)
+function likeKey() {
+  return `liked:${me.userId}:${postId}`;
+}
+function likeCountKey() {
+  return `likeCount:${postId}`;
+}
+function isLiked() {
+  return localStorage.getItem(likeKey()) === "1";
+}
+function setLiked(v) {
+  localStorage.setItem(likeKey(), v ? "1" : "0");
+}
+function setCachedLikeCount(cnt) {
+  localStorage.setItem(likeCountKey(), String(cnt));
+}
+function applyLikeStyle() {
+  // 피그마 스펙: disable(D9D9D9) ↔ enable(ACA0EB)
+  if (!likeBtn) return;
+  likeBtn.style.background = isLiked() ? "#ACA0EB" : "#D9D9D9";
+  likeBtn.style.cursor = "pointer";
+}
+
 async function load() {
   const res = await PostsAPI.get(postId);
   post = res?.data;
@@ -80,6 +104,10 @@ async function load() {
 
   likeCountEl.textContent = formatCount(post.likeCount);
   hitCountEl.textContent = formatCount(post.hits);
+
+  // ✅ 목록 반영용 캐시 저장 + 색상 반영
+  setCachedLikeCount(post.likeCount);
+  applyLikeStyle();
 
   if (me?.userId === post.authorUserId) {
     ownerActions.style.display = "flex";
@@ -126,6 +154,7 @@ async function loadComments() {
         commentSubmit.textContent = "댓글 수정";
         canSubmitComment();
       });
+
       item.querySelector("[data-del]").addEventListener("click", async () => {
         const ok = await confirmModal({
           title: "댓글을 삭제하시겠습니까?",
@@ -157,6 +186,31 @@ commentSubmit.addEventListener("click", async () => {
   canSubmitComment();
   await loadComments();
 });
+
+// ✅ 좋아요 토글
+if (likeBtn) {
+  likeBtn.addEventListener("click", async () => {
+    try {
+      let res;
+      if (!isLiked()) {
+        res = await PostsAPI.like(postId);
+        setLiked(true);
+      } else {
+        res = await PostsAPI.unlike(postId);
+        setLiked(false);
+      }
+
+      const newCnt = res?.data?.likeCount ?? post.likeCount;
+      post.likeCount = newCnt;
+
+      likeCountEl.textContent = formatCount(newCnt);
+      setCachedLikeCount(newCnt); // ✅ 목록 반영
+      applyLikeStyle();           // ✅ 색상 토글
+    } catch (e) {
+      console.error(e);
+    }
+  });
+}
 
 editBtn.addEventListener("click", () => {
   location.href = `./edit-post.html?postId=${postId}`;
