@@ -51,7 +51,7 @@ async function checkEmailAvailability() {
     const res = await AuthAPI.emailAvailability(email);
     emailAvailable = !!res?.data?.available;
     if (!emailAvailable) emailH.textContent = "* 중복된 이메일 입니다.";
-  } catch (_) {}
+  } catch (_) { }
 }
 
 async function checkNickAvailability() {
@@ -63,7 +63,7 @@ async function checkNickAvailability() {
     const res = await AuthAPI.nicknameAvailability(nick);
     nickAvailable = !!res?.data?.available;
     if (!nickAvailable) nickH.textContent = "* 중복된 닉네임 입니다.";
-  } catch (_) {}
+  } catch (_) { }
 }
 
 function validateAll() {
@@ -90,6 +90,9 @@ function validateAll() {
     emailH.textContent = "* 중복된 이메일 입니다.";
   }
 
+  if (emailH.textContent) emailEl.classList.add("error");
+  else emailEl.classList.remove("error");
+
   if (!pw) {
     ok = false;
     pwH.textContent = "* 비밀번호를 입력해주세요.";
@@ -98,6 +101,9 @@ function validateAll() {
     pwH.textContent = "* 비밀번호는 8자 이상, 20자 이하이며, 대문자, 소문자, 숫자, 특수문자를 각각 최소 1개 포함해야 합니다.";
   }
 
+  if (pwH.textContent) pwEl.classList.add("error");
+  else pwEl.classList.remove("error");
+
   if (!pw2) {
     ok = false;
     pw2H.textContent = "* 비밀번호를 한번 더 입력해주세요.";
@@ -105,6 +111,9 @@ function validateAll() {
     ok = false;
     pw2H.textContent = "* 비밀번호가 다릅니다.";
   }
+
+  if (pw2H.textContent) pw2El.classList.add("error");
+  else pw2El.classList.remove("error");
 
   if (!nick) {
     ok = false;
@@ -119,6 +128,9 @@ function validateAll() {
     ok = false;
     nickH.textContent = "* 중복된 닉네임 입니다.";
   }
+
+  if (nickH.textContent) nickEl.classList.add("error");
+  else nickEl.classList.remove("error");
 
   setEnabled(btn, ok);
 }
@@ -162,6 +174,7 @@ form.addEventListener("submit", async (e) => {
       profileImageUrl: profileDataUrl,
     });
 
+    alert("회원가입이 완료되었습니다."); // Alert added
     location.href = "./login.html";
   } catch (err) {
     if (err instanceof ApiError) {
