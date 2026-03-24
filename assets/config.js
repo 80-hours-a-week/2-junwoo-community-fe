@@ -2,6 +2,6 @@
 // 그 외(Live Server 등 포트가 있는 로컬 환경)에서는 8000 포트의 백엔드를 직접 호출합니다.
 export const API_BASE = (window.location.port === "80" || window.location.port === "")
     ? ""
-    : "http://localhost:8000";
+    : "http://localhost:8001";
 
 
