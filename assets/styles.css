@@ -501,7 +501,7 @@ textarea {
   font-size: 13px;
 }
 
-.comment-input-row button disabled {
+.comment-input-row button:disabled {
   opacity: .5;
 }
 
